@@ -84,7 +84,8 @@ extern NSString * const kMMXMessageObject;
  *
  *  @param message Message string.
  *  @param cache   Conversation to post to.
+ *  @param result  Completition result - message if success, or error
  */
-+ (void)postMessage:(NSString*)message toConversation:(MMXMessageCache*)cache;
++ (void)postMessage:(NSString*)message toConversation:(MMXMessageCache*)cache completition:(void(^)(MMXMessage *message, NSError *error))result;
 
 @end;

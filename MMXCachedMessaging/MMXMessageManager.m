@@ -286,10 +286,12 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }];
 }
 
-+ (void)postMessage:(NSString*)message toConversation:(MMXMessageCache*)cache;
++ (void)postMessage:(NSString*)message toConversation:(MMXMessageCache*)cache completition:(void(^)(MMXMessage *message, NSError *error))result
 {
     [cache.channel publish:@{kMMXMessageContent: message} success:^(MMXMessage * _Nonnull message) {
+        result?result(message,nil):nil;
     } failure:^(NSError * _Nonnull error) {
+        result?result(nil,error):nil;
     }];
 }
 
