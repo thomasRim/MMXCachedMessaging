@@ -264,23 +264,14 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 + (void)createConversationName:(NSString*)name summary:(NSString*)summary users:(NSArray <MMUser *> *)users completition:(void(^)(MMXMessageCache *cache, NSError *error))result
 {
-    [MMXChannel createWithName:name summary:summary isPublic:YES publishPermissions:MMXPublishPermissionsSubscribers success:^(MMXChannel * _Nonnull channel) {
-        [channel subscribeWithSuccess:^{
-            [MMUser usersWithUserIDs:[MMXMessageManager userIDs:users] success:^(NSArray<MMUser *> * mmusers) {
-                for (MMUser *mmuser in mmusers) {
-                    [channel inviteUser:mmuser comments:kPrivateConversation success:^(MMXInvite * _Nonnull invite) {
-                        
-                    } failure:^(NSError * _Nonnull error) {
-                        
-                    }];
-                }
-                result?result([MMXMessageCache messageCacheForChannel:channel],nil):nil;
-            } failure:^(NSError * error) {
-                result?result(nil,error):nil;
-            }];
-        } failure:^(NSError * _Nonnull error) {
-            result?result([MMXMessageCache messageCacheForChannel:channel],nil):nil;
-        }];
+    NSMutableSet *usersSet = [NSMutableSet setWithArray:users];
+    [usersSet addObject:[MMUser currentUser]];
+    
+    [MMXChannel createWithName:name summary:summary isPublic:YES publishPermissions:MMXPublishPermissionsSubscribers  subscribers:usersSet success:^(MMXChannel * _Nonnull channel) {
+
+        result?result([MMXMessageCache messageCacheForChannel:channel],nil):nil;
+
+
     } failure:^(NSError * _Nonnull error) {
         result?result(nil,error):nil;
     }];
