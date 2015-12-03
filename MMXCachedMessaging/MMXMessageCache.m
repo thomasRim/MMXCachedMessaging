@@ -33,8 +33,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     
     NSString *channelName = [MMXMessageCache fileNameForChannel:channel];
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *filePath = [paths[0] stringByAppendingPathComponent:channelName];
+    NSString *filePath = [[MMXMessageCache userCachesPath] stringByAppendingPathComponent:channelName];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]
         && ([NSData dataWithContentsOfFile:filePath].length > 0)) {
@@ -63,8 +62,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 {
     NSString *channelName = [MMXMessageCache fileNameForChannel:channel];
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *filePath = [paths[0] stringByAppendingPathComponent:channelName];
+    NSString *filePath = [[MMXMessageCache userCachesPath] stringByAppendingPathComponent:channelName];
     NSError *error = nil; // just info
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
     error?NSLog(@"msgCacheRemErr %@",error):nil;
@@ -146,8 +144,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     }
     
     if (channelName) {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *filePath = [paths[0] stringByAppendingPathComponent:channelName];
+        NSString *filePath = [[MMXMessageCache userCachesPath] stringByAppendingPathComponent:channelName];
         
         [NSKeyedArchiver archiveRootObject:self toFile:filePath];
     }
@@ -186,5 +183,16 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     return FString(@"%@%@",channel.name,kMMXCachedMessageExtension);
 }
 
++ (NSString*)userCachesPath
+{
+    NSString *userPath = nil;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    userPath = [paths[0] stringByAppendingPathComponent:[MMUser currentUser].userID];
+    [[NSFileManager defaultManager] createDirectoryAtPath:userPath
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    return userPath;
+}
 
 @end

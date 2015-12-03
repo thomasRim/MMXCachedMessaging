@@ -25,4 +25,11 @@ extern NSString * const kMMXCachedMessageExtension;
 
 - (NSInteger)unreadMessagesCount;
 
+/**
+ *  Path to directory for storing user's cache
+ *
+ *  @return Path to user's cache directory
+ */
++ (NSString*)userCachesPath;
+
 @end

@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v1.6"
+#define AppWithCachingCheckVersion @"v1.7"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
@@ -69,7 +69,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
             [[NSUserDefaults standardUserDefaults] setObject:AppWithCachingCheckVersion forKey:AppWithCachingCheckVersion];
             //lets load cahed message caches with channel
             
-            NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageManager userCachesPath] error:nil];
+            NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageCache userCachesPath] error:nil];
             NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
             NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
             if (logFiles.count) {
@@ -179,13 +179,13 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 {
     //lets load cahed message caches with channel
 
-    NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageManager userCachesPath] error:nil];
+    NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageCache userCachesPath] error:nil];
     NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
     NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
     
     NSMutableArray *messageCacheChannels = @[].mutableCopy;
     for (NSString *logFile in logFiles) {
-        MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[[MMXMessageManager userCachesPath] stringByAppendingPathComponent:logFile]];
+        MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[[MMXMessageCache userCachesPath] stringByAppendingPathComponent:logFile]];
         [messageCacheChannels addObject:cache];
     }
     if (messageCacheChannels.count) {
@@ -369,16 +369,6 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     return [allUsers componentsJoinedByString:kChannesSummarySeparator];
 }
 
-+ (NSString*)userCachesPath
-{
-    NSString *userPath = nil;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    userPath = [paths[0] stringByAppendingPathComponent:[MMUser currentUser].userID];
-    [[NSFileManager defaultManager] createDirectoryAtPath:userPath
-                              withIntermediateDirectories:YES
-                                               attributes:nil
-                                                    error:nil];
-    return userPath;
-}
+
 
 @end
