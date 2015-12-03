@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v1.4"
+#define AppWithCachingCheckVersion @"v1.5"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
@@ -68,9 +68,8 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
         if (![[NSUserDefaults standardUserDefaults] objectForKey:AppWithCachingCheckVersion]) {
             [[NSUserDefaults standardUserDefaults] setObject:AppWithCachingCheckVersion forKey:AppWithCachingCheckVersion];
             //lets load cahed message caches with channel
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
             
-            NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:paths[0] error:nil];
+            NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageManager userCachesPath] error:nil];
             NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
             NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
             if (logFiles.count) {
@@ -179,15 +178,14 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 + (void)getAllConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
 {
     //lets load cahed message caches with channel
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 
-    NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:paths[0] error:nil];
+    NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageManager userCachesPath] error:nil];
     NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
     NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
     
     NSMutableArray *messageCacheChannels = @[].mutableCopy;
     for (NSString *logFile in logFiles) {
-        MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[paths[0] stringByAppendingPathComponent:logFile]];
+        MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[[MMXMessageManager userCachesPath] stringByAppendingPathComponent:logFile]];
         [messageCacheChannels addObject:cache];
     }
     if (messageCacheChannels.count) {
@@ -195,7 +193,8 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }
 
     // here we check server data for channels
-    [MMXChannel allPublicChannelsWithLimit:100 offset:0 success:^(int totalCount, NSArray<MMXChannel *> * _Nonnull channels) {
+    
+    [MMXChannel subscribedChannelsWithSuccess:^(NSArray<MMXChannel *> * _Nonnull channels) {
         NSMutableArray *availablePublics = channels.mutableCopy;
         //exclude Zero topic
         for (MMXChannel *ch in channels) {
@@ -235,9 +234,10 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
             channel.name = logFileName;
             [MMXMessageCache removeMessageCacheForChannel:channel];
         }
-        
+
     } failure:^(NSError * _Nonnull error) {
         result?result(nil,error):nil;
+
     }];
 }
 
@@ -253,7 +253,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 + (void)createConversationWithUsers:(NSArray <MMUser *> *)users completition:(void(^)(MMXMessageCache *cache, NSError *error))result
 {
-    NSString *name = [NSUUID UUID].UUIDString;
+    NSString *name = [NSString stringWithFormat:@"chat-%@",[NSUUID UUID].UUIDString];
 
     NSString *summary = [MMXMessageManager channelSummaryWithInvitees:users];
     
@@ -367,6 +367,18 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }].mutableCopy;
     
     return [allUsers componentsJoinedByString:kChannesSummarySeparator];
+}
+
++ (NSString*)userCachesPath
+{
+    NSString *userPath = nil;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    userPath = [paths[0] stringByAppendingPathComponent:[MMUser currentUser].userID];
+    [[NSFileManager defaultManager] createDirectoryAtPath:userPath
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    return userPath;
 }
 
 @end

@@ -64,7 +64,7 @@ extern NSString * const kMMXMessageObject;
 /**
  *  Create new conversation with creating message cache.
  *
- *  @param users  Users that will be invited for this conversation.
+ *  @param users  Users that will be invited for this conversation. Summary will contain users list string.
  *  @param result Callback with cached conversation, or error if something wrong.
  */
 + (void)createConversationWithUsers:(NSArray <MMUser *> *)users completition:(void(^)(MMXMessageCache *cache, NSError *error))result;
