@@ -14,6 +14,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 #define kMessageCacheMessages @"messages"
 #define kMessageCacheUnreadCount @"unreadCount"
 #define kMessageCacheChannel @"channel"
+#define kMessageCacheSubscribers @"subscribers"
 
 #define FString(str, ...) [NSString stringWithFormat:(str), ##__VA_ARGS__]
 
@@ -132,6 +133,13 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     [self saveMessageCache];
 }
 
+- (void)setSubscribers:(NSArray *)subscribers
+{
+    _subscribers = subscribers;
+    
+    [self saveMessageCache];
+}
+
 - (void)saveMessageCache
 {
     NSString *channelName = nil;
@@ -164,6 +172,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
         self.messages = [aDecoder decodeObjectForKey:kMessageCacheMessages];
         self.unreadCount = [aDecoder decodeIntegerForKey:kMessageCacheUnreadCount];
         self.channel = [aDecoder decodeObjectForKey:kMessageCacheChannel];
+        self.subscribers = [aDecoder decodeObjectForKey:kMessageCacheSubscribers];
     }
     return self;
 }
@@ -174,6 +183,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     [aCoder encodeObject:self.messages forKey:kMessageCacheMessages];
     [aCoder encodeInteger:self.unreadCount forKey:kMessageCacheUnreadCount];
     [aCoder encodeObject:self.channel forKey:kMessageCacheChannel];
+    [aCoder encodeObject:self.subscribers forKey:kMessageCacheSubscribers];
 }
 
 #pragma mark - Helpers

@@ -17,6 +17,7 @@ extern NSString * const kMMXCachedMessageExtension;
 @property (nonatomic, strong) NSDate *lastReadDate;
 @property (nonatomic, strong) NSArray <MMXMessage*> *messages;
 @property (nonatomic, strong) MMXChannel *channel;
+@property (nonatomic, strong) NSArray *subscribers;
 
 + (instancetype)messageCacheForChannel:(MMXChannel*)channel;
 + (instancetype)messageCacheForFileAtPath:(NSString*)filePath;

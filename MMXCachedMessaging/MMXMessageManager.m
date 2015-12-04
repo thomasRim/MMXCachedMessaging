@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v1.7"
+#define AppWithCachingCheckVersion @"v1.9"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
