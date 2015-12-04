@@ -39,6 +39,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]
         && ([NSData dataWithContentsOfFile:filePath].length > 0)) {
         messageCache = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        messageCache.channel = channel;
     } else {
         messageCache = [MMXMessageCache new];
         messageCache.channel = channel;
