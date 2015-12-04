@@ -191,7 +191,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 
 + (NSString*)fileNameForChannel:(MMXChannel*)channel
 {
-    return FString(@"%@%@",channel.name,kMMXCachedMessageExtension);
+    return FString(@"%@%@",channel.name.lowercaseString,kMMXCachedMessageExtension);
 }
 
 + (NSString*)userCachesPath

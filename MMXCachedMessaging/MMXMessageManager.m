@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v2.0"
+#define AppWithCachingCheckVersion @"v2.1"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
@@ -76,7 +76,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
                 for (NSString *logFile in logFiles) {
                     NSString *logFileName = [logFile stringByReplacingOccurrencesOfString:kMMXCachedMessageExtension withString:@""];
                     MMXChannel *channel = [MMXChannel new];
-                    channel.name = logFileName;
+                    channel.name = logFileName.lowercaseString;
                     [MMXMessageCache removeMessageCacheForChannel:channel];
                 }
             }
@@ -208,7 +208,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
             BOOL linked = NO;
             for (MMXChannel *pubChannel in availablePublics) {
                 NSString *logFileName = [logFile stringByReplacingOccurrencesOfString:kMMXCachedMessageExtension withString:@""];
-                if ([logFileName isEqualToString:pubChannel.name]) {
+                if ([logFileName.lowercaseString isEqualToString:pubChannel.name.lowercaseString]) {
                     linked = YES;
                     break;
                 }
@@ -220,7 +220,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
         for (NSString *logFile in nonlinkedCaches) {
             NSString *logFileName = [logFile stringByReplacingOccurrencesOfString:kMMXCachedMessageExtension withString:@""];
             MMXChannel *channel = [MMXChannel new];
-            channel.name = logFileName;
+            channel.name = logFileName.lowercaseString;
             [MMXMessageCache removeMessageCacheForChannel:channel];
         }
 
