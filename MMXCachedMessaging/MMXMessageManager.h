@@ -46,11 +46,18 @@ extern NSString * const kMMXMessageObject;
 
 // Conversation Activity
 /**
- *  Getting cached conversations. There might be repetitive callbacks. One if there are existing cached conversations. Other when conversations did updated with server messages.
+ *  Getting server conversation updates.
  *
- *  @param result Callback with cached conversations, or error if something wrong.
+ *  @param result Callback with existing channel cache conversations, or error if something wrong.
  */
-+ (void)getAllConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result;
++ (void)getNewConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result;
+
+/**
+ *  Getting cached conversations.
+ *
+ *  @param result Callback with existing saved user's conversation caches.
+ */
++ (void)getCachedConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result;
 
 /**
  *  Doing update to single conversation.

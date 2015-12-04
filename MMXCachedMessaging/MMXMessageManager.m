@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v1.9"
+#define AppWithCachingCheckVersion @"v2.0"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
@@ -175,24 +175,13 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 #pragma mark - Conversation Activity
 
-+ (void)getAllConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
++ (void)getNewConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
 {
-    //lets load cahed message caches with channel
-
+    // here we check server data for channels
+    
     NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageCache userCachesPath] error:nil];
     NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
     NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
-    
-    NSMutableArray *messageCacheChannels = @[].mutableCopy;
-    for (NSString *logFile in logFiles) {
-        MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[[MMXMessageCache userCachesPath] stringByAppendingPathComponent:logFile]];
-        [messageCacheChannels addObject:cache];
-    }
-    if (messageCacheChannels.count) {
-        result?result(messageCacheChannels,nil):nil;
-    }
-
-    // here we check server data for channels
     
     [MMXChannel subscribedChannelsWithSuccess:^(NSArray<MMXChannel *> * _Nonnull channels) {
         NSMutableArray *availablePublics = channels.mutableCopy;
@@ -240,6 +229,28 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
     }];
 }
+
++ (void)getCachedConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
+{
+    //lets load cahed message caches with channel
+    NSError *error = nil;
+    NSArray *dirFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[MMXMessageCache userCachesPath] error:&error];
+    if (error) {
+        result?result(nil,error):nil;
+    } else {
+        NSString *predicateFormat = [NSString stringWithFormat:@"self ENDSWITH '%@'",kMMXCachedMessageExtension];
+        NSArray *logFiles = [dirFiles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:predicateFormat]];
+        
+        NSMutableArray *messageCacheChannels = @[].mutableCopy;
+        for (NSString *logFile in logFiles) {
+            MMXMessageCache *cache = [MMXMessageCache messageCacheForFileAtPath:[[MMXMessageCache userCachesPath] stringByAppendingPathComponent:logFile]];
+            [messageCacheChannels addObject:cache];
+        }
+        
+        result?result(messageCacheChannels,error):nil;
+    }
+}
+
 
 + (void)getMessageUpdateForConversation:(MMXMessageCache*)messageCache startingDate:(NSDate  *)startDate completition:(void(^)(NSArray <MMXMessage*> *messages, NSError *error))result
 {
