@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v2.4"
+#define AppWithCachingCheckVersion @"v2.5"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 
@@ -96,7 +96,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
         
     } failure:^(NSError * error) {
         result?result([MMXClient sharedClient].connectionStatus,error):nil;
-        [[MMXMessageManager shared] showAlertWithTitle:@"MagnetMax initModule Error" message:error.localizedDescription];
+//        [[MMXMessageManager shared] showAlertWithTitle:@"MagnetMax initModule Error" message:error.localizedDescription];
     }];
 }
 
@@ -347,11 +347,11 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     return ids;
 }
 
-- (void)showAlertWithTitle:(NSString *)title message:(NSString *)message
-{
-    [[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert] addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-    }]];
-}
+//- (void)showAlertWithTitle:(NSString *)title message:(NSString *)message
+//{
+//    [[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert] addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+//    }]];
+//}
 
 #pragma mark - Messaging
 
