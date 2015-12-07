@@ -74,8 +74,6 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 {
     if (self = [super init]) {
         self.messages = @[];
-        self.lastReadDate = [NSDate date];
-        self.unreadCount = 0;
     }
     return self;
 }
@@ -116,10 +114,9 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
         _messages = messages;
         _unreadCount = _messages.count;
     } else {
+        // check  and add non existing message objects
         NSMutableArray *composetMessages = _messages.mutableCopy;
-        
-        _unreadCount = 0;
-        
+    
         for (MMXMessage *nMessage in messages) {
             BOOL exist = NO;
             for (MMXMessage *oMessage in _messages) {
@@ -129,7 +126,6 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
                 }
             }
             if (!exist) {
-                _unreadCount +=1;
                 [composetMessages addObject:nMessage];
             }
         }
@@ -139,6 +135,16 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
             NSString *ts2 = FString(@"%@",@(m2.timestamp.timeIntervalSince1970));
             return [ts1 compare:ts2 options:NSNumericSearch];
         }];
+        
+        // look for unread messages after @lastReadDate
+        _unreadCount = 0;
+
+        for (MMXMessage *message in _messages) {
+            if (message.timestamp.timeIntervalSince1970 > _lastReadDate.timeIntervalSince1970) {
+                _unreadCount +=1;
+            }
+        }
+
     }
     
     [self saveMessageCache];
