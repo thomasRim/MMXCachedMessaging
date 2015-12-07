@@ -93,6 +93,16 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 {
     _lastReadDate = lastReadDate?:[NSDate date];
     
+    if (_messages.count) {
+        for (MMXMessage *message in _messages) {
+            if (message.timestamp.timeIntervalSince1970 > _lastReadDate.timeIntervalSince1970) {
+                _unreadCount +=1;
+            }
+        }
+    } else {
+        _unreadCount = 0;
+    }
+    
     [self saveMessageCache];
 }
 

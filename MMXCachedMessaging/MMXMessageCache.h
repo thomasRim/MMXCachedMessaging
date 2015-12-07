@@ -19,11 +19,22 @@ extern NSString * const kMMXCachedMessageExtension;
 @property (nonatomic, strong) MMXChannel *channel;
 @property (nonatomic, strong) NSArray *subscribers;
 
+/**
+ *  Object loading or by @channel MMX object or by @filePath string
+ */
 + (instancetype)messageCacheForChannel:(MMXChannel*)channel;
 + (instancetype)messageCacheForFileAtPath:(NSString*)filePath;
 
+/**
+ *  Removing cache file from storage.
+ */
 + (void)removeMessageCacheForChannel:(MMXChannel*)channel;
 
+/**
+ *  Determing number of messages that were set later of @lastReadDate. @lastReadDate do updates automaticaly by setting messages at very first time, or manually. Adding new messages may update unread messagesCount value. Number of unread messages may update on setting @lastReadDate value.
+ *
+ *  @return Count of messages later @lastReadDate.
+ */
 - (NSInteger)unreadMessagesCount;
 
 /**
