@@ -20,15 +20,19 @@ extern NSString * const kMMXMessageObject;
 
 @interface MMXMessageManager : NSObject
 
-
-@property (nonatomic, strong) NSString *deviceToken;
-
 /**
  *  Setup MessageManager before connection to MMX server
  *
  *  @param enableZero NO - by default. If set to YES - this will enable to send message by {postMessageToZero:} to all users via 'Zero' topic. Using 'NotificationMMXZeroMessageReceived' - one can receive 'Zero' topic messages. 'Zero' topic is public, but not cacheable and not listed in Conversations list.
  */
 + (void)enableZeroTopic:(BOOL)enableZero; // NO - by dafault.
+
+/**
+ *  Setup MessageManager for cahcing incoming messages directly to cached file before notifying app.
+ *
+ *  @param updateCaches NO- by default, there'll be a NSNotification object with MMXMessage in @userInfo. YES - MMXMessage will be added to cache and after that there'll be a NSNotification object with MMXMessage in @userInfo
+ */
++ (void)updateCachesWithIncomingMessages:(BOOL)updateCaches;
 
 /**
  *  Use this method to connect logged user to MMX server

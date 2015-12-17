@@ -8,9 +8,10 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v2.5"
+#define AppWithCachingCheckVersion @"v2.6"
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
+#define kCacheIncomingMessages @"cacheIncomingMessages"
 
 #define kPrivateConversation @"private_conversation"
 #define kChannelNameSeparator @"_"
@@ -59,6 +60,15 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }
 }
 
++ (void)updateCachesWithIncomingMessages:(BOOL)updateCaches
+{
+    if (updateCaches) {
+        [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:kCacheIncomingMessages];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCacheIncomingMessages];
+    }
+}
+
 + (void)connectLoggedUserToMMX:(void (^)(MMXConnectionStatus, NSError *))result
 {
 
@@ -100,7 +110,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }];
 }
 
-+ (void)subscribeForZeroChannel:(void(^)(BOOL sucess))result
++ (void)subscribeForZeroChannel:(void(^)(BOOL))result
 {
     //check if zero channel exist
     [MMXChannel channelForName:kZeroChannelID isPublic:YES success:^(MMXChannel * _Nonnull channel) {
@@ -175,7 +185,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 #pragma mark - Conversation Activity
 
-+ (void)getNewConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
++ (void)getNewConversations:(void(^)(NSArray <MMXMessageCache*> *, NSError *))result
 {
     // here we check server data for channels
     
@@ -230,7 +240,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }];
 }
 
-+ (void)getCachedConversations:(void(^)(NSArray <MMXMessageCache*> *conversations, NSError *error))result
++ (void)getCachedConversations:(void(^)(NSArray <MMXMessageCache*> *, NSError *))result
 {
     //lets load cahed message caches with channel
     NSError *error = nil;
@@ -252,7 +262,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 }
 
 
-+ (void)getMessageUpdateForConversation:(MMXMessageCache*)messageCache startingDate:(NSDate  *)startDate completition:(void(^)(NSArray <MMXMessage*> *messages, NSError *error))result
++ (void)getMessageUpdateForConversation:(MMXMessageCache*)messageCache startingDate:(NSDate  *)startDate completition:(void(^)(NSArray <MMXMessage*> *, NSError *))result
 {
     [messageCache.channel messagesBetweenStartDate:startDate?:kWeekAgoDate endDate:[NSDate date] limit:1000 offset:0 ascending:YES success:^(int totalCount, NSArray<MMXMessage *> * _Nonnull messages) {
         messageCache.messages = messages;
@@ -323,6 +333,10 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
         [[NSNotificationCenter defaultCenter] postNotificationName:NotificationMMX_ZeroMessageReceived object:nil userInfo:content];
     } else {
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:kCacheIncomingMessages]) {
+            [MMXMessageCache messageCacheForChannel:channel].messages = @[messageObj];
+        }
+        
         NSDictionary *content = @{kMMXMessageObject : messageObj};
         [[NSNotificationCenter defaultCenter] postNotificationName:NotificationMMX_MessageReceived object:nil userInfo:content];
     }
