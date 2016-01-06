@@ -6,4 +6,4 @@ platform :ios, '8.0'
 
 use_frameworks!
 
-pod 'MagnetMax', '~> 2.1'
+pod 'MagnetMax', '~> 2.2'
