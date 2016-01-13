@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion @"v2.8"
+#define AppWithCachingCheckVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 #define kCacheIncomingMessages @"cacheIncomingMessages"
@@ -206,8 +206,10 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
         // and report results
         NSMutableArray *caches = @[].mutableCopy;
         for (MMXChannel *channel in availablePublics) {
-            MMXMessageCache *cache = [MMXMessageCache messageCacheForChannel:channel];
-            [caches addObject:cache];
+            if (channel.isSubscribed) {
+                MMXMessageCache *cache = [MMXMessageCache messageCacheForChannel:channel];
+                [caches addObject:cache];
+            }
         }
         result?result(caches,nil):nil;
         
@@ -218,7 +220,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
             BOOL linked = NO;
             for (MMXChannel *pubChannel in availablePublics) {
                 NSString *logFileName = [logFile stringByReplacingOccurrencesOfString:kMMXCachedMessageExtension withString:@""];
-                if ([logFileName.lowercaseString isEqualToString:pubChannel.name.lowercaseString]) {
+                if ([logFileName.lowercaseString isEqualToString:pubChannel.name.lowercaseString] && pubChannel.isSubscribed) {
                     linked = YES;
                     break;
                 }
@@ -312,11 +314,14 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 - (void)invitationToChannel:(NSNotification*)note
 {
-//    NSLog(@"invitation come %@",note);
     NSDictionary *userInfo = note.userInfo;
     MMXInvite *invite = userInfo[MMXInviteKey];
+    NSLog(@"invitation come %@",invite.channel.name);
+
     [invite acceptWithComments:kPrivateConversation success:^{
+        NSLog(@"invite accepted");
     } failure:^(NSError * _Nonnull error) {
+        NSLog(@"invite accept error %@",error);
     }];
 }
 
