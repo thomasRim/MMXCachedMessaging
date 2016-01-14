@@ -8,7 +8,7 @@
 
 #import "MMXMessageManager.h"
 
-#define AppWithCachingCheckVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define AppWithCachingCheckVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]
 
 #define kZeroChannelID @"GlobalAppActivityChannel"
 #define kCacheIncomingMessages @"cacheIncomingMessages"
