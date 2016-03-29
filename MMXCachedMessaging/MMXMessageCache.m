@@ -74,6 +74,7 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 {
     if (self = [super init]) {
         self.messages = @[];
+        self.lastReadDate = [NSDate date];
     }
     return self;
 }
@@ -90,29 +91,18 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 - (void)setLastReadDate:(NSDate *)lastReadDate
 {
     _lastReadDate = lastReadDate?:[NSDate date];
-    
-    _unreadCount = 0;
+    [self unreadMessagesCount];
 
-    if (_messages.count) {
-        for (MMXMessage *message in _messages) {
-            if (message.timestamp.timeIntervalSince1970 > _lastReadDate.timeIntervalSince1970) {
-                _unreadCount +=1;
-            }
-        }
-    }
-    
     [self saveMessageCache];
 }
 
 - (void)setMessages:(NSArray <MMXMessage*>*)messages
 {
-    if (!_lastReadDate) {
-        _lastReadDate = [NSDate date];
-    }
-    
     if (!_messages.count) {
+
         _messages = messages;
-        _unreadCount = _messages.count;
+        [self unreadMessagesCount];
+
     } else {
         // check  and add non existing message objects
         NSMutableArray *composetMessages = _messages.mutableCopy;
@@ -135,18 +125,11 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
             NSString *ts2 = FString(@"%@",@(m2.timestamp.timeIntervalSince1970));
             return [ts1 compare:ts2 options:NSNumericSearch];
         }];
-        
-        // look for unread messages after @lastReadDate
-        _unreadCount = 0;
 
-        for (MMXMessage *message in _messages) {
-            if (message.timestamp.timeIntervalSince1970 > _lastReadDate.timeIntervalSince1970) {
-                _unreadCount +=1;
-            }
-        }
+        [self unreadMessagesCount];
 
     }
-    
+
     [self saveMessageCache];
 }
 
@@ -177,6 +160,16 @@ NSString * const kMMXCachedMessageExtension = @".mmxchannellog";
 
 - (NSInteger)unreadMessagesCount
 {
+    _unreadCount = 0;
+
+    if (_messages.count) {
+        for (MMXMessage *message in _messages) {
+            if (message.timestamp.timeIntervalSince1970 >= _lastReadDate.timeIntervalSince1970) {
+                _unreadCount +=1;
+            }
+        }
+    }
+
     return self.unreadCount;
 }
 

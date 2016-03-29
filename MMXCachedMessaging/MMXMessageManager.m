@@ -151,7 +151,6 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
         }
     } failure:^(NSError * _Nonnull error) {
-//        result?result(NO):nil;
         NSLog(@"failed - channel for name  %@",error);
         // create zero channel
         [MMXChannel createWithName:kZeroChannelID summary:kZeroChannelID isPublic:YES publishPermissions:MMXPublishPermissionsSubscribers success:^(MMXChannel * _Nonnull channel) {
@@ -294,7 +293,6 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
         result?result([MMXMessageCache messageCacheForChannel:channel],nil):nil;
 
-
     } failure:^(NSError * _Nonnull error) {
         result?result(nil,error):nil;
     }];
@@ -316,7 +314,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 {
     NSDictionary *userInfo = note.userInfo;
     MMXInvite *invite = userInfo[MMXInviteKey];
-    NSLog(@"invitation come %@",invite.channel.name);
+    NSLog(@"* mmxcache * ==> invitation come %@",invite.channel.name);
 
     [invite acceptWithComments:kPrivateConversation success:^{
         NSLog(@"invite accepted");
@@ -331,7 +329,9 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     
     MMXMessage *messageObj = userInfo[MMXMessageKey];
     MMXChannel *channel = messageObj.channel;
- 
+
+    NSLog(@"* mmxcache * ==> message income %@ /n%@",channel.name,messageObj.messageContent);
+
     if ([channel.name.lowercaseString isEqualToString:kZeroChannelID.lowercaseString]) {
 
         NSDictionary *content = @{kMMXMessageObject : messageObj};
@@ -350,7 +350,7 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
 
 - (void)messageSendError:(NSNotification*)note
 {
-    NSLog(@"message sending fail %@",note);
+    NSLog(@"* mmxcache * ==> message sending fail %@",note);
 }
 
 
@@ -365,12 +365,6 @@ NSString * const kMMXMessageObject = @"kMMXMessageObject";
     }
     return ids;
 }
-
-//- (void)showAlertWithTitle:(NSString *)title message:(NSString *)message
-//{
-//    [[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert] addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-//    }]];
-//}
 
 #pragma mark - Messaging
 
